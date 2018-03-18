@@ -4,7 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
- 
+
+import model.Tweet;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
@@ -16,6 +21,7 @@ public class KafkaConsumer {
     private final String topic = KafkaConstants.TOPIC;
  
     public void initialize() {
+    	// initialize the kafka consumer
           Properties props = new Properties();
           props.put("zookeeper.connect", KafkaConstants.ZOOKEEPER_HOST);
           props.put("group.id", "twittergroup");
@@ -24,6 +30,8 @@ public class KafkaConsumer {
           props.put("auto.commit.interval.ms", "100");
           ConsumerConfig conConfig = new ConsumerConfig(props);
           consumerConnector = Consumer.createJavaConsumerConnector(conConfig);
+        // initialize the redshift connector
+          
     }
  
     public void consume() {
@@ -42,8 +50,13 @@ public class KafkaConsumer {
           for (final KafkaStream<byte[], byte[]> kStreams : kStreamList) {
                  ConsumerIterator<byte[], byte[]> consumerIte = kStreams.iterator();
                 
-                 while (consumerIte.hasNext())
-                        System.out.println(new String(consumerIte.next().message()));              
+                 while (consumerIte.hasNext()) {
+                	 JsonObject jsonObj = new JsonParser().parse(new String(consumerIte.next().message())).getAsJsonObject();
+                     if (Tweet.isValidTweet(jsonObj)) {
+                    	 Tweet tweet = new Tweet();
+//                    	 tweet.setId(jsonObj.get);
+                     }
+                 }
           }
           //Shutdown the consumer connector
           if (consumerConnector != null)   consumerConnector.shutdown();          
