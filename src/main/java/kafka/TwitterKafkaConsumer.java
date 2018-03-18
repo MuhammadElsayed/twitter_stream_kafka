@@ -10,13 +10,14 @@ import model.Tweet;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import db.RedShiftDataEmitter;
 import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
  
-public class KafkaConsumer {
+public class TwitterKafkaConsumer {
     private ConsumerConnector consumerConnector = null;
     private final String topic = KafkaConstants.TOPIC;
  
@@ -54,7 +55,11 @@ public class KafkaConsumer {
                 	 JsonObject jsonObj = new JsonParser().parse(new String(consumerIte.next().message())).getAsJsonObject();
                      if (Tweet.isValidTweet(jsonObj)) {
                     	 Tweet tweet = new Tweet();
-//                    	 tweet.setId(jsonObj.get);
+                    	 tweet.setId(jsonObj.get("id").getAsString());
+                    	 tweet.setTag(jsonObj.get("entities").getAsJsonObject().get("hashtags").getAsJsonArray().get(0).getAsJsonObject().get("text").getAsString());
+                    	 tweet.setLat(jsonObj.get("coordinates").getAsJsonObject().get("coordinates").getAsJsonArray().get(1).getAsString());
+                    	 tweet.setLang(jsonObj.get("coordinates").getAsJsonObject().get("coordinates").getAsJsonArray().get(0).getAsString());
+                    	 RedShiftDataEmitter.getInstance().insert(tweet);
                      }
                  }
           }
@@ -63,7 +68,7 @@ public class KafkaConsumer {
     }
  
     public static void main(String[] args) throws InterruptedException {
-          KafkaConsumer kafkaConsumer = new KafkaConsumer();
+          TwitterKafkaConsumer kafkaConsumer = new TwitterKafkaConsumer();
           // Configure Kafka consumer
           kafkaConsumer.initialize();
           // Start consumption

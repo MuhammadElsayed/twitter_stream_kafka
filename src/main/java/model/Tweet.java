@@ -41,7 +41,15 @@ public class Tweet {
 	String lang;
 
 	public static boolean isValidTweet(JsonObject jsonObj) {
-		// TODO Auto-generated method stub
-		return false;
+		if (jsonObj == null)
+			return false;
+		if (!jsonObj.has("coordinates") || jsonObj.get("coordinates").isJsonNull())
+			return false;
+		if (!jsonObj.get("coordinates").getAsJsonObject().get("type").getAsString().equalsIgnoreCase("point"))
+			return false;
+		if (jsonObj.get("entities").getAsJsonObject().get("hashtags").getAsJsonArray().size() == 0)
+			return false;
+		
+		return true;
 	}
 }
