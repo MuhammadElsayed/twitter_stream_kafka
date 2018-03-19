@@ -43,12 +43,14 @@ public class RedShiftDataEmitter {
 			stmt = connection.createStatement();
 			String sql;
 			sql = "insert into data values(" + tweet.getId() + ",'"
-					+ tweet.getTag() + "'," + tweet.getLat() + ","
+					+ tweet.getTag() 
+					//+"job"
+					+ "'," + tweet.getLat() + ","
 					+ tweet.getLang() + ");";
-			System.out.println(sql);
+			//System.out.println(sql);
 			int result = stmt.executeUpdate(sql);
 
-			System.out.println(result);
+			//System.out.println(result);
 			stmt.close();
 			// conn.close();
 		} catch (Exception ex) {
