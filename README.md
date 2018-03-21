@@ -14,14 +14,20 @@
 
 # How to run
  1- for the producer APP
+
+
  	-run the main of TwitterKafkaProducer with JDK 7
 
 
  2- for the consumer APP without the spark streaming
+
+
     -run TwitterKafkaConsumer with any JDK
 
 
  3- for the consumer with the Spark Stream
+
+ 
     -run TwitterKafkaConsumerWithSpark
 
 
